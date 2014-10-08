@@ -1,8 +1,11 @@
 package Zabbix::Cli::Monitor;
 
 use strict;
-use 5.008_005;
+use warnings;
+use v5.10;
 our $VERSION = '0.01';
+
+use Moo;
 
 1;
 __END__
@@ -11,7 +14,7 @@ __END__
 
 =head1 NAME
 
-Zabbix::Cli::Monitor - Blah blah blah
+Zabbix::Cli::Monitor - Keep up-to-date with Zabbix from the command line
 
 =head1 SYNOPSIS
 
@@ -19,7 +22,8 @@ Zabbix::Cli::Monitor - Blah blah blah
 
 =head1 DESCRIPTION
 
-Zabbix::Cli::Monitor is
+Zabbix::Cli::Monitor is a simple application that uses the Zabbix API to get details
+of any hosts that have problems.
 
 =head1 AUTHOR
 

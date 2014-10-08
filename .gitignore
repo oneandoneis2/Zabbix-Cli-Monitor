@@ -1,0 +1,8 @@
+/Zabbix-Cli-Monitor-*
+/.build
+/_build*
+/Build
+MYMETA.*
+!META.json
+/.prove
+*.swp

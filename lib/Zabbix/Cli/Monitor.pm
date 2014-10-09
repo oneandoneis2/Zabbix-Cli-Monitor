@@ -20,6 +20,23 @@ has zabbix => ( is => 'rw' );
 sub BUILD {
     my ($self) = @_;
 
+    unless (
+        $self->_config_data->{api_url} &&
+        $self->_config_data->{user} &&
+        $self->_config_data->{password}
+        ) {
+        say "No valid config file found. Please ensure config file exists and has required fields defined. Example:";
+        say <<EOF;
+~/.zabmon/config.yaml
+---
+user: api_user
+api_url: http://your.zabbix.url/api_jsonrpc.php
+password: imal33thaxx0r
+EOF
+        exit 1;
+        }
+
+
     my $zabbix = Zabbix::API->new(
         server => $self->_config_data->{api_url},
         verbosity => 0
@@ -85,7 +102,7 @@ sub say_current_issues {
         my $name = $hn->{name};
         my $desc = $trigger->{description};
 
-        $desc =~ s/\{HOST.NAME\}/$name/; # Parse Zabbixy stuff
+        $desc =~ s/\{HOST\.NAME\}/$name/; # Parse Zabbixy stuff
 
         print color 'cyan';
         say "$host";
@@ -111,7 +128,7 @@ Zabbix::Cli::Monitor - Keep up-to-date with Zabbix from the command line
 =head1 DESCRIPTION
 
 Zabbix::Cli::Monitor is a simple application that uses the Zabbix API to get details
-of any hosts that have problems.
+of any hosts that have problems. More stuff to come. Probably.
 
 =head1 AUTHOR
 

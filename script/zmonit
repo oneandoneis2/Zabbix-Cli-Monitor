@@ -2,8 +2,10 @@
 
 use strict;
 use warnings;
-use lib '../lib';
+use lib 'lib';
 
 use Zabbix::Cli::Monitor;
 
-Zabbix::Cli::Monitor->new();
+
+my $z = Zabbix::Cli::Monitor->new_with_options();
+$z->say_current_issues();

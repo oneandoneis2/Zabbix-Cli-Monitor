@@ -5,7 +5,95 @@ use warnings;
 use v5.10;
 our $VERSION = '0.01';
 
-use Moo;
+use Zabbix::API;
+use JSON;
+use Term::ANSIColor;
+
+use MooseX::App::Simple qw(Color ConfigHome);
+
+use Data::Dumper;
+$Data::Dumper::Sortkeys = 1;
+$Data::Dumper::Indent = 1;
+
+has zabbix => ( is => 'rw' );
+
+sub BUILD {
+    my ($self) = @_;
+
+    my $zabbix = Zabbix::API->new(
+        server => $self->_config_data->{api_url},
+        verbosity => 0
+        );
+
+    eval {
+        $zabbix->login(
+            user => $self->_config_data->{user},
+            password => $self->_config_data->{password}
+        );
+    };
+
+    die "could not authenticate\n$@" if $@;
+
+    $self->zabbix($zabbix);
+}
+
+sub get_current_triggers {
+    my ($self) = @_;
+
+    my $resp = $self->zabbix->raw_query(
+        method => 'trigger.get',
+        params => {
+            output => 'extend', # Helpfully(?) you don't get the description by default
+            monitored => 1,     # Helpfully(?) unmonitored hosts are included by default
+            selectHosts => 1,   # Helpfully(?) the trigger's host is not included by default
+            filter => {         # Filter to triggers that are still happening
+                value => 1
+            }
+        }
+    );
+    # Returns the data as a JSON string in _content,
+    # get it into a useful data structure:
+    my $content = from_json($resp->{_content});
+    return $content->{result};
+}
+
+sub get_host_list {
+    my ($self, $hosts) = @_;
+
+    my $resp = $self->zabbix->fetch(
+        'Host',
+        params => { hostids => $hosts }
+    );
+    return map {
+        $_->data->{hostid}, { name => $_->data->{name}, host => $_->data->{host} }
+        } @{$resp};
+}
+
+sub say_current_issues {
+    my ($self) = @_;
+
+    my $triggers = $self->get_current_triggers();
+
+    # Get host name data to map to triggers
+    my @trigger_hosts = map { $_->{hosts}[0]{hostid} } @$triggers;
+    my %hostnames = $self->get_host_list( \@trigger_hosts );
+
+    # Print out summary of triggered hosts
+    for my $trigger (@$triggers) {
+        my $hn = $hostnames{ $trigger->{hosts}[0]{hostid} };
+        my $host = $hn->{host};
+        my $name = $hn->{name};
+        my $desc = $trigger->{description};
+
+        $desc =~ s/\{HOST.NAME\}/$name/; # Parse Zabbixy stuff
+
+        print color 'cyan';
+        say "$host";
+        print color 'red';
+        say "\t$desc\n";
+        print color 'reset';
+    }
+}
 
 1;
 __END__

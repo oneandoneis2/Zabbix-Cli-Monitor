@@ -1,6 +1,6 @@
 # NAME
 
-Zabbix::Cli::Monitor - Blah blah blah
+Zabbix::Cli::Monitor - Keep up-to-date with Zabbix from the command line
 
 # SYNOPSIS
 
@@ -8,7 +8,9 @@ Zabbix::Cli::Monitor - Blah blah blah
 
 # DESCRIPTION
 
-Zabbix::Cli::Monitor is
+Zabbix::Cli::Monitor is a simple application that uses the Zabbix API to get details
+of any hosts that have problems. More stuff to come. Probably. Just run the 'zabmon'
+script.
 
 # AUTHOR
 

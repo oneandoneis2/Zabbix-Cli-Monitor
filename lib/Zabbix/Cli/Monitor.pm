@@ -91,6 +91,12 @@ sub say_current_issues {
 
     my $triggers = $self->get_current_triggers();
 
+    unless ( scalar @$triggers ) {
+        print color 'green';
+        say "No current issues";
+        print color 'reset'
+    }
+
     # Get host name data to map to triggers
     my @trigger_hosts = map { $_->{hosts}[0]{hostid} } @$triggers;
     my %hostnames = $self->get_host_list( \@trigger_hosts );
@@ -128,7 +134,8 @@ Zabbix::Cli::Monitor - Keep up-to-date with Zabbix from the command line
 =head1 DESCRIPTION
 
 Zabbix::Cli::Monitor is a simple application that uses the Zabbix API to get details
-of any hosts that have problems. More stuff to come. Probably.
+of any hosts that have problems. More stuff to come. Probably. Just run the 'zabmon'
+script.
 
 =head1 AUTHOR
 
